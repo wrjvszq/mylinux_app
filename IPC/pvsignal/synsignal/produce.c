@@ -1,8 +1,8 @@
 /*************************************************************************
-  > 文件名  : bstudent.c
+  > 文件名  : produce.c
   > 作者    : @wrj
   > 邮箱    : wrjvszq@163.com
-  > 创建时间: Fri 28 Nov 2014 07:28:10 PM CST
+  > 创建时间: Sat 29 Nov 2014 04:13:35 PM CST
   > 功能说明： 
  ************************************************************************/
 
@@ -10,8 +10,8 @@
 #include<sys/stat.h>
 #include<fcntl.h>
 #include<unistd.h>
-#include<sys/ipc.h>
 #include<sys/sem.h>
+#include<sys/ipc.h>
 
 int main(void)
 {
@@ -19,29 +19,20 @@ int main(void)
     int semid = 0;
     key_t key;
     struct sembuf sops;
-    int ret;
 
-
-    key = ftok("/home",1);
-
-    fd = open("./board.txt",O_RDWR|O_APPEND);
- 
+    key = ftok("/home",2);
     semid = semget(key,1,IPC_CREAT);
+    semctl(semid,0,SETVAL,0);
 
-    printf("value is %d\n",(int)semctl(semid,0,GETVAL));
+    fd = open("./test.txt",O_RDWR|O_CREAT,0666);
 
-    sops.sem_num = 0;
-    sops.sem_op = -1;
-    sops.sem_flg = SEM_UNDO;
-    semop(semid,&sops,1);
+    sleep(10);
 
-    printf("the value is %d\n",(int)semctl(semid,0,GETVAL));
-
-
-    write(fd,"qwer",4);
+    write(fd,"123456",7);
 
     sops.sem_num = 0;
     sops.sem_op = 1;
+    sops.sem_flg = SEM_UNDO;
     semop(semid,&sops,1);
 
     close(fd);
